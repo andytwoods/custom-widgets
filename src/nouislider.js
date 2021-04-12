@@ -68,6 +68,11 @@ function init(Survey) {
           category: "slider",
           default: true,
         },
+        {
+          name: "decimals:number",
+          category: "slider",
+          default: 2,
+        },
       ]);
     },
     afterRender: function (question, el) {
@@ -98,11 +103,18 @@ function init(Survey) {
           format: {
             to: function (pVal) {
               var pipText = pVal;
+              const origText = pVal;
+              var index = 0;
               question.pipsText.map(function (el) {
-                if (el.text !== undefined && pVal === el.value) {
+
+                if (pVal === el.value) {
+
                   pipText = el.text;
                 }
               });
+              if(pipText===origText){
+                pipText = '<div style="max-width:100px;" >' + Number(pVal).toFixed(question.decimals)+'</div>';
+              }
               return pipText;
             },
           },
@@ -133,6 +145,7 @@ function init(Survey) {
           el.removeAttribute("disabled");
         }
       };
+      question.value = slider.get();
     },
     willUnmount: function (question, el) {
       if (!!question.noUiSlider) {

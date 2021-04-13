@@ -1,0 +1,173 @@
+
+@font-face {
+    font-family: "Lato";
+    src: url("../fonts/Lato/Lato-Regular.woff") format("woff");
+}
+
+@font-face {
+    font-family: "Lato-Bold";
+    src: url("../fonts/Lato/Lato-Bold.woff") format("woff");
+}
+
+@font-face {
+    font-family: "Lato-Light";
+    src: url("../fonts/Lato/Lato-Light.woff") format("woff");
+}
+
+body {
+    font-family: 'Lato', sans-serif;
+    background-color: #F8F9F9;
+    color: #454647;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Lato-Light";
+    color: #222326;
+}
+
+.lato-bold {
+    font-family: 'Lato-Bold', sans-serif;
+}
+
+.navbar {
+    border-bottom: 1px solid #D9DADC;
+    background-color: white;
+    font-family: 'Lato-Light', sans-serif;
+}
+
+.navbar a {
+    font-family: 'Lato-Light', sans-serif;
+    color:#222326;
+}
+
+.navbar a.navbar-brand {
+    font-size: 1.5rem;
+    font-family: 'Lato-Bold', sans-serif;
+    color:#222326;
+   
+}
+a:hover {
+    color:#222326;
+    text-decoration: none !important;
+}
+
+ 
+ @media (max-width: 768px) {
+   .navbar-nav .nav-item:not(:last-child) {
+     border-right: none;
+   }
+ }
+
+ .btn-vanilla, .navbar-light .nav-item .btn-vanilla, .sv_complete_btn {
+    border-color: #D9DADC;
+    font-weight: bold;
+    color:#222326;
+    background-color: white;
+    font-family: 'Lato-Bold', sans-serif;
+    font-size:1.1rem;
+
+ }
+ .sv_complete_btn {
+     float:right;
+ }
+ .card-footer:after {
+    display: block;
+    clear: both;
+    content: "";
+ }
+ .panel-footer.card-footer {
+     border: none;
+     background-color: white;
+ }
+ 
+.card-header {
+    background-color: white;
+    border-bottom:1px solid #D9DADC;
+    font-family: "Lato-Light";
+    color: #454647;  
+    font-size: 1.3rem;
+}
+
+a {
+    color:#333333;
+      font-family: "Lato-Bold";
+    
+}
+.form-check {
+    font-size: .9rem;
+}
+.alert-danger {
+    background-color: white;
+    border-color: #c0392b;
+    color: #c0392b;
+}
+.alert-danger ul {
+    list-style: none;
+    padding: 0px;
+}
+
+.btn-primary {
+    background-color: #222326;
+}
+
+/* manage emails */
+.btn-link {
+    font-weight: 400;
+    color: #222326;
+    text-decoration: none;
+    display: block;
+    line-height: 0.6rem;
+}
+
+.sub-header {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    color:#222326;
+    font-size: 1.1rem;
+    border-bottom: 1px solid #D9DADC;
+}
+
+.card-table {
+    background-color: white;
+    border:1px solid #D9DADC;   
+}
+.card-table th {
+    font-family: 'Lato-Bold', sans-serif;
+    color: #454647;
+}
+
+
+.card-top-icon {
+    text-align: center;
+    display: block;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+}
+
+.vanilla-card .card-text {
+    height:4rem;
+}
+.vanilla-card .card-link {
+    color:#222326;
+    font-family: 'Lato-Bold', sans-serif;
+    
+}
+
+.card-block h3 {
+    padding: 1rem;
+}
+
+.pair_code {
+    text-align: center;
+    border:1px solid #D9DADC;
+    font-weight: bold;
+    color:#222326;
+    background-color: #F8F9F9;
+    font-family: 'Lato-Bold', sans-serif;
+    font-size:1.1rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    
+    width: 100%;
+    font-size: 5rem;
+}

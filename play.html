@@ -1,0 +1,738 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>StoryFutures Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+
+
+  <link rel="stylesheet" href="my_staticfiles/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.13.0/css/all.css"
+        integrity="sha384-IIED/eyOkM6ihtOiQsX2zizxFBphgnv1zbe1bKA+njdFzkr6cDNy16jfIKWu4FNH" crossorigin="anonymous">
+  <link rel="stylesheet" href="my_staticfiles/css/select2-bootstrap4.css">
+
+
+
+  <link rel="stylesheet" href="my_staticfiles/css/pnotify.custom.css">
+  <link rel="stylesheet" href="my_staticfiles/css/animate.css">
+
+
+  <script src="my_staticfiles/js/jquery-3.5.1.min.js" ></script>
+  <script type = "text/javascript"
+          src = "https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js">
+  </script>
+  <script src="my_staticfiles/js/bootstrap.bundle.min.js"></script>
+
+
+
+  <meta name="viewport" content="width=device-width"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js"></script>
+  <script src="https://surveyjs.azureedge.net/1.8.16/survey.ko.js"></script>
+  <link href="https://surveyjs.azureedge.net/1.8.16/survey.css" type="text/css" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.10/ace.min.js" type="text/javascript"
+          charset="utf-8"></script>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+  <link href="https://surveyjs.azureedge.net/1.8.16/survey-creator.min.css" type="text/css" rel="stylesheet"/>
+  <script src="https://surveyjs.azureedge.net/1.8.16/survey-creator.min.js"></script>
+  <link href="my_staticfiles/survey/editor_custom.css" type="text/css" rel="stylesheet"/>
+
+  <script src="https://cdn.ckeditor.com/4.14.1/standard/ckeditor.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.6.4/showdown.min.js"></script>
+
+  <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+  <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/smoothness/jquery-ui.css" type="text/css"
+        rel="stylesheet"/>
+
+
+  <script src="https://unpkg.com/sortablejs@1.7.0/Sortable.js"></script>
+
+  <script src="my_staticfiles/survey/nouislider/nouislider.js"></script>
+  <script src="https://unpkg.com/wnumb@1.1.0"></script>
+  <link href="my_staticfiles/survey/nouislider/nouislider.min.css" rel="stylesheet"/>
+
+  <script src="my_staticfiles/survey/surveyjs-widgets.js"></script>
+
+
+  <style>
+      .svd-vertical-container__cell-content {
+          overflow: auto;
+      }
+  </style>
+
+
+
+
+
+</head>
+
+<body  class="d-flex flex-column min-vh-100">
+
+<header>
+
+
+
+</header>
+
+<content>
+
+
+
+  <div id="surveyCreatorContainer"></div>
+  <script>
+    function calc_height() {
+      var window_height = $(window).height() - $('#surveyCreatorContainer').offset().top;
+      $('#surveyCreatorContainer').css('height', window_height);
+    }
+
+    $(window).resize(calc_height);
+    calc_height();
+  </script>
+
+
+
+  <script type="text/html" id="custom-tab-survey-templates">
+    <h3 data-bind="text: title"></h3>
+    <p>Select the templates you want to add at the bottom of your survey</p>
+    <table class="table" style="width:300px">
+      <tbody>
+      <!-- ko foreach: surveys -->
+      <tr>
+        <td>
+          <button data-bind="click:function() { $parent.load($data) }">Add</button>
+        </td>
+        <td data-bind="text:name"></td>
+      </tr>
+      <!-- /ko -->
+      </tbody>
+    </table>
+  </script>
+
+  <script>
+    jQuery.event.special.touchstart = {
+      setup: function (_, ns, handle) {
+        this.addEventListener("touchstart", handle, {passive: !ns.includes("noPreventDefault")});
+      }
+    };
+  </script>
+
+  <script>
+
+    var options = {showLogicTab: true, designerHeight: '', autoSaveDelay: 1000};
+    SurveyCreator.StylesManager.applyTheme("orange");
+
+    var CkEditor_ModalEditor = {
+      afterRender: function (modalEditor, htmlElement) {
+        var editor = CKEDITOR.replace(htmlElement);
+        var isUpdating = false;
+        editor.on("change", function () {
+          isUpdating = true;
+          modalEditor.editingValue = editor.getData();
+          isUpdating = false;
+        });
+        editor.setData(modalEditor.editingValue);
+        modalEditor.onValueUpdated = function (newValue) {
+          if (!isUpdating) {
+            editor.setData(newValue);
+          }
+        };
+      },
+      destroy: function (modalEditor, htmlElement) {
+        var instance = CKEDITOR.instances[htmlElement.id];
+        if (instance) {
+          instance.removeAllListeners();
+          instance.destroy(true);
+          CKEDITOR.remove(instance);
+        }
+      }
+    };
+
+    SurveyCreator
+      .SurveyPropertyModalEditor
+      .registerCustomWidget("html", CkEditor_ModalEditor);
+    SurveyCreator
+      .SurveyPropertyModalEditor
+      .registerCustomWidget("text", CkEditor_ModalEditor);
+
+    var questionDef = SurveyCreator.SurveyQuestionEditorDefinition.definition.question;
+
+    //Modify Question Editor. Remove title from general and add it as a tab.
+    questionDef
+      .tabs
+      .push({name: "title", index: 1});
+    SurveyCreator
+      .defaultStrings
+      .pe
+      .tabs["title"] = "Title";
+    var ind = questionDef
+      .properties
+      .indexOf("title");
+    if (ind > -1)
+      questionDef
+        .properties
+        .splice(ind, 1);
+
+    //Create showdown mardown converter
+    var converter = new showdown.Converter();
+
+    function doMarkdown(survey, options) {
+      //convert the mardown text to html
+      var str = converter.makeHtml(options.text);
+      if (str.indexOf("<p>") === 0) {
+        //remove root paragraphs<p></p>
+        str = str.substring(3);
+        str = str.substring(0, str.length - 4);
+      }
+      //set html
+      options.html = str;
+    }
+
+
+    var surveyCreator = new SurveyCreator.SurveyCreator(null, options);
+
+    surveyCreator.isAutoSave = true;
+    surveyCreator.showState = true;
+
+    for (var item of ['datepicker', 'microphone', 'editor']) {
+      surveyCreator.toolbox.removeItem(item);
+    }
+
+    surveyCreator.saveSurveyFunc = function (saveNo, callback) {
+
+    };
+
+    surveyCreator
+      .tabs()
+      .unshift({
+        name: "survey-templates", //the unique tab name
+        title: "Templates", //the tab title
+        template: "custom-tab-survey-templates", //you will see the knockout template in the HTML tab
+        action: () => {
+          //change the active tab to this one on clicking the tab
+          surveyCreator.makeNewViewActive("survey-templates");
+        },
+        data: {
+          title: "Survey templates list",
+          surveys: loadedSurveyTemplates(),
+          load: load_items
+        }
+      });
+
+    surveyCreator
+      .survey
+      .onTextMarkdown
+      .add(doMarkdown);
+    surveyCreator
+      .onDesignerSurveyCreated
+      .add(function (editor, options) {
+        options
+          .survey
+          .onTextMarkdown
+          .add(doMarkdown);
+      });
+    surveyCreator
+      .onTestSurveyCreated
+      .add(function (editor, options) {
+        options
+          .survey
+          .onTextMarkdown
+          .add(doMarkdown);
+      });
+
+    function load_items(item) {
+
+      if (item['json']['type'] === 'page') {
+        addPage(item['json']);
+        return;
+      }
+
+      var sub_items = item['json']['elementsJSON'];
+      var item_count = sub_items.length;
+      var item_count_str = item_count.toString();
+
+      new PNotify({
+        title: 'Adding ' + item_count_str + ' questions. Please wait...',
+        type: 'info',
+        delay: 500,
+      });
+
+      for (var i in sub_items) {
+        addEl(sub_items[i], i, item_count);
+      }
+
+    }
+
+
+    function addPage(page_info) {
+      new PNotify({
+        title: 'Adding page. Please wait...',
+        type: 'info',
+        delay: 500,
+      });
+      var template_element = Survey.Serializer.createClass(page_info.type);
+      template_element.fromJSON(page_info);
+
+      var page = surveyCreator.survey.addPage(template_element);
+
+
+      addEl(page_info, page);
+
+
+      new PNotify({
+        title: 'Added page.',
+        type: 'info',
+        delay: 500,
+      });
+    }
+
+    function addEl(q, i, item_count, page) {
+      setTimeout(function () {
+        var template_element = Survey.Serializer.createClass(q.type);
+        template_element.fromJSON(q);
+
+        if (!page) page = surveyCreator.survey.currentPage;
+        if (!page) return;
+
+
+        console.log(template_element, q)
+        page.addQuestion(template_element);
+        new PNotify({
+          title: 'Added ' + template_element.name + ' question',
+          type: 'info',
+          delay: 500,
+        });
+        if (i === item_count) {
+          if (template_element) surveyCreator.selectedElement = template_element;
+          new PNotify({
+            title: 'Added ' + item_count + ' questions.',
+            type: 'info',
+            delay: 500,
+          });
+        }
+      }, 10);
+    }
+
+    surveyCreator.render("surveyCreatorContainer");
+    surveyCreator.JSON = {"pages": [{"name": "Concept Test", "title": "Green Planet AR Concept Test", "elements": [{"name": "question1", "step": -11, "type": "nouislider", "decimals": 3, "pipsText": [0, 25, 50, 75, 100], "tooltips": false, "pipsValues": [0, 25, 50, 75, 100]}]}, {"name": "Demographics", "title": "Demographics", "elements": [{"name": "age", "type": "text", "title": "What is your age in years?", "inputType": "number"}, {"name": "country", "type": "dropdown", "title": "Which country do you live in?", "choicesByUrl": {"url": "https://restcountries.eu/rest/v2/all"}, "optionsCaption": "Select a country..."}, {"name": "gender", "type": "text", "title": "To which gender identity do you most identify?"}, {"name": "ethnic", "type": "dropdown", "title": "What is your ethnic group?", "choices": [{"text": "Asian / Asian British", "value": "item1"}, {"text": "Black / African / Caribbean / Black British", "value": "item2"}, {"text": "Mixed / multiple ethnic", "value": "item3"}, {"text": "White", "value": "item4"}, {"text": "Other ethnic group", "value": "item5"}]}, {"name": "education", "type": "dropdown", "title": "What is your highest level of education?", "choices": [{"text": "GCSEs or equivalent | <=16 years old", "value": "item1"}, {"text": "A-Levels or equivalent | <=18 years old", "value": "item2"}, {"text": "Degree of equivalent", "value": "item3"}, {"text": "MA/MSc or equivalent", "value": "item4"}, {"text": "PhD or equivalent", "value": "item5"}, {"text": "Other", "value": "item6"}]}, {"name": "question32", "type": "checkbox", "title": "Do you consider yourself to be a gamer (e.g. PC or console games?)", "choices": [{"text": "Yes, a light gamer", "value": "item1"}, {"text": "Yes, a moderate gamer", "value": "item2"}, {"text": "Yes, a heavy gamer", "value": "item3"}, {"text": "No", "value": "item4"}]}, {"name": "question33", "type": "checkbox", "title": "Are you a parent or guardian of one or more children under the age of 18?", "choices": [{"text": "Yes", "value": "item1"}, {"text": "No", "value": "item2"}]}, {"name": "question27", "type": "expression", "title": "<p>That was the last question. Thank you for your participation, which helps us to make great AR experiences. If you have any outstanding questions about the experience please contact Sucharita Ghosh Stephenson (the XR Producer from Factory 42, sucharita.ghoshstephenson@factory42.uk) or about the research please contact&nbsp;Isabelle Verhulst (StoryFutures Researcher, isabelle.verhulst@rhul.ac.uk). We hope you have found this an enjoyable&nbsp;experience.</p>\n", "hideNumber": true}], "description": "<p>Please answer the questions below, thank you.</p>\n"}]};
+
+    function loadedSurveyTemplates() {
+      var templates = [];
+
+      // used in backend template
+      function process_templates(template) {
+        templates.push({'name': template['name'], 'json': template})
+      }
+
+
+
+      process_templates({
+          "name": "demographics",
+          "title": "demographics",
+          "titleLocation": "hidden",
+          "hideNumber": true,
+          "category": "measures",
+          "elementsJSON": [
+            {
+              "type": "text",
+              "name": "age",
+              "title": "Age",
+              "inputType": "number"
+            },
+            {
+              "type": "text",
+              "name": "gender",
+              "title": "Gender"
+            },
+            {
+              "type": "dropdown",
+              "name": "education",
+              "title": "What is your highest level of education?",
+              "choices": [
+                {
+                  "value": "item1",
+                  "text": "GCSEs or equivalent | <=16 years old"
+                },
+                {
+                  "value": "item2",
+                  "text": "A-Levels or equivalent | <=18 years old"
+                },
+                {
+                  "value": "item3",
+                  "text": "Degree of equivalent"
+                },
+                {
+                  "value": "item4",
+                  "text": "MA/MSc or equivalent"
+                },
+                {
+                  "value": "item5",
+                  "text": "PhD or equivalent"
+                },
+                {
+                  "value": "item6",
+                  "text": "Other"
+                }
+              ]
+            },
+            {
+              "type": "dropdown",
+              "name": "ethnic",
+              "title": "What is your ethnic group",
+              "choices": [
+                {
+                  "value": "item1",
+                  "text": "Asian / Asian British"
+                },
+                {
+                  "value": "item2",
+                  "text": "Black / African / Caribbean / Black British"
+                },
+                {
+                  "value": "item3",
+                  "text": "Mixed / multiple ethnic"
+                },
+                {
+                  "value": "item4",
+                  "text": "White"
+                },
+                {
+                  "value": "item5",
+                  "text": "Other ethnic group"
+                }
+              ]
+            },
+            {
+              "type": "dropdown",
+              "name": "country",
+              "optionsCaption": "Select a country...",
+              "choicesByUrl": {
+                "url": "https://restcountries.eu/rest/v2/all"
+              }
+            }]
+        }
+      );
+      process_templates({
+          "name": "enjoyment",
+          "title": "enjoyment",
+          "titleLocation": "hidden",
+          "hideNumber": true,
+          "category": "measures",
+          "elementsJSON": [
+            {
+              "type": "radiogroup",
+              "name": "enjoy",
+              "title": "Overall, how much did you enjoy the experience?",
+              "startWithNewLine": true,
+              "choices": [
+                {
+                  "value": 1,
+                  "text": "★ Did not enjoy at all"
+                },
+                {
+                  "value": 2,
+                  "text": "★★"
+                },
+                {
+                  "value": 3,
+                  "text": "★★★"
+                },
+                {
+                  "value": 4,
+                  "text": "★★★★"
+                },
+                {
+                  "value": 5,
+                  "text": "★★★★★ Enjoyed very much"
+                }
+              ]
+            }
+
+          ]
+        }
+
+      );
+      process_templates({
+          "name": "flow",
+          "title": "flow",
+          "titleLocation": "hidden",
+          "hideNumber": true,
+          "category": "measures",
+          "elementsJSON": [
+            {
+              "type": "html",
+              "html": "<h6>To what extent do you agree with the below?</h6>"
+            },
+            {
+              "type": "radiogroup",
+              "name": "flow_thoughts",
+              "title": "My thoughts/activities were running fluidly and smoothly.",
+              "startWithNewLine": true,
+              "choices": [
+                {
+                  "value": 4,
+                  "text": "strongly agree"
+                },
+                {
+                  "value": 3,
+                  "text": "\t"
+                },
+                {
+                  "value": 2,
+                  "text": "\t"
+                },
+                {
+                  "value": 1,
+                  "text": "\t"
+                },
+                {
+                  "value": 0,
+                  "text": "strongly disagree"
+                }
+              ]
+            },
+
+            {
+              "type": "radiogroup",
+              "name": "flow_absorbed",
+              "title": "I was totally absorbed in what I was doing.",
+              "startWithNewLine": false,
+              "choices": [
+                {
+                  "value": 4,
+                  "text": "strongly agree"
+                },
+                {
+                  "value": 3,
+                  "text": "\t"
+                },
+                {
+                  "value": 2,
+                  "text": "\t"
+                },
+                {
+                  "value": 1,
+                  "text": "\t"
+                },
+                {
+                  "value": 0,
+                  "text": "strongly disagree"
+                }
+              ]
+            },
+            {
+              "type": "html",
+              "html": "<h6>In terms of time...</h6>"
+            },
+            {
+              "type": "radiogroup",
+              "name": "flow_time",
+              "title": "did it flow differently from normal?",
+              "startWithNewLine": true,
+              "choices": [
+                {
+                  "value": 4,
+                  "text": "far more quickly"
+                },
+                {
+                  "value": 3,
+                  "text": "\t"
+                },
+                {
+                  "value": 2,
+                  "text": "no difference"
+                },
+                {
+                  "value": 1,
+                  "text": "\t"
+                },
+                {
+                  "value": 0,
+                  "text": "far more slowly"
+                }
+              ]
+            }
+
+          ]
+        }
+      );
+      process_templates({
+          "name": "presence",
+          "title": "presence",
+          "titleLocation": "hidden",
+          "category": "measures",
+          "hideNumber": true,
+          "elementsJSON": [
+            {
+              "type": "html",
+              "html": "<h6>To what extent do you agree with the below?</h6>"
+            },
+            {
+              "type": "radiogroup",
+              "name": "presence_G1_4",
+              "title": "In the computer generated world I had a sense of \"being there\".",
+              "startWithNewLine": true,
+              "choices": [
+                {
+                  "value": 4,
+                  "text": "very much so"
+                },
+                {
+                  "value": 3,
+                  "text": "\t"
+                },
+                {
+                  "value": 2,
+                  "text": "\t"
+                },
+                {
+                  "value": 1,
+                  "text": "\t"
+                },
+                {
+                  "value": 0,
+                  "text": "not at all"
+                }
+              ]
+            },
+            {
+              "type": "radiogroup",
+              "name": "presence_SP5_question",
+              "title": "I felt present in the virtual space.",
+              "startWithNewLine": false,
+              "choices": [
+                {
+                  "value": 4,
+                  "text": "fully agree"
+                },
+                {
+                  "value": 3,
+                  "text": "\t"
+                },
+                {
+                  "value": 2,
+                  "text": "\t"
+                },
+                {
+                  "value": 1,
+                  "text": "\t"
+                },
+                {
+                  "value": 0,
+                  "text": "fully disagree"
+                }
+              ]
+            },
+            {
+              "type": "radiogroup",
+              "name": "presence_INV4_question",
+              "startWithNewLine": false,
+              "title": "I was completely captivated by the virtual world.",
+              "choices": [
+                {
+                  "value": 4,
+                  "text": "fully agree"
+                },
+                {
+                  "value": 3,
+                  "text": "\t"
+                },
+                {
+                  "value": 2,
+                  "text": "\t"
+                },
+                {
+                  "value": 1,
+                  "text": "\t"
+                },
+                {
+                  "value": 0,
+                  "text": "fully disagree"
+                }
+              ]
+            },
+            {
+              "type": "radiogroup",
+              "name": "REAL3_question",
+              "title": "How real did the virtual world seem to you?",
+              "startWithNewLine": false,
+              "choices": [
+                {
+                  "value": 4,
+                  "text": "indistinguishable from the real world\n"
+                },
+                {
+                  "value": 3,
+                  "text": "\t"
+                },
+                {
+                  "value": 2,
+                  "text": "\t"
+                },
+                {
+                  "value": 1,
+                  "text": "\t"
+                },
+                {
+                  "value": 0,
+                  "text": "about as real as an imagined world\n"
+                }
+              ]
+            }
+          ]
+        }
+      );
+      process_templates({
+          "name": "separator",
+          "title": "separator",
+          "titleLocation": "hidden",
+          "hideNumber": true,
+          "category": "measures",
+          "elementsJSON": [{
+            "type": "html",
+            "name": "seperator",
+            "html": "<div class=\"my-5 p-5 bg-dark\"></div>"
+          }]
+        }
+      );
+
+
+
+
+      return templates
+    }
+
+
+    // Add a new item into element menu
+    surveyCreator.toolbarItems
+      .unshift({
+        id: "toolboxCustomization",
+        visible: true,
+        title: "View",
+        enabled: true,
+        action: function () {
+          window.location = '/survey/do/feca0599-381d-4698-97c8-f402703276bc/';
+
+        }
+      });
+
+  </script>
+
+
+</content>
+
+
+
+
+
+</body>
+</html>
+

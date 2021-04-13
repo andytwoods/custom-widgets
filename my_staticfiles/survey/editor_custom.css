@@ -1,0 +1,11 @@
+.svd_container.sv_default_css label {
+  font-weight: initial !important;
+}
+.sv_page_title {
+  font-size: 2em!important;
+  margin-bottom: 1em;
+}
+
+.sv_container {
+  padding: 10px;
+}

@@ -38,12 +38,13 @@ function init(Survey) {
           default: "positions",
         },
         {
-          name: "pipsValues:itemvalues",
+          name: "pipsText:itemvalues",
           category: "slider",
           default: [0, 25, 50, 75, 100],
         },
         {
-          name: "pipsText:itemvalues",
+          name: "pipsOrientation:itemvalues",
+          displayName: "label orientation (left, center [default], right)",
           category: "slider",
           default: [0, 25, 50, 75, 100],
         },
@@ -69,9 +70,9 @@ function init(Survey) {
           default: true,
         },
         {
-          name: "decimals:number",
+          name: "decimals:int",
           category: "slider",
-          default: 2,
+          default: 0,
         },
       ]);
     },
@@ -95,7 +96,7 @@ function init(Survey) {
         }),
         pips: {
           mode: question.pipsMode || "positions",
-          values: question.pipsValues.map(function (pVal) {
+          values: question.pipsText.map(function (pVal) {
             var pipValue = pVal;
             if (pVal.value !== undefined) {
               pipValue = pVal.value;
@@ -112,10 +113,26 @@ function init(Survey) {
                   pipText = el.text;
                 }
               });
-              if(pipText == origPVal){
-                return Number(origPVal).toFixed(question.decimals);
+              function alignment(txt){
+                var found = question.pipsOrientation.find(function(el){
+                  return el.text!==undefined && pVal === el.value;
+                });
+                if(found){
+                  switch(found.text.toLowerCase()) {
+                    case('left'):
+                      return "<div style='transform: translateX(50%);'>" + txt + "</div>";
+                    case('right'):
+                      return "<div style='transform: translateX(-50%);'>" + txt + "</div>";
+                  }
+                }
+                return txt;
               }
-              return pipText;
+              if(pipText == origPVal){
+                console.log(question.decimals,22)
+                var val = Number(origPVal).toFixed(question.decimals);
+                return alignment(val);
+              }
+              return alignment(pipText);
             },
             from: function (value) {
               return Number(value).toFixed(question.decimals);

@@ -90,6 +90,9 @@ function init(Survey) {
         connect: [true, false],
         step: question.step,
         tooltips: question.tooltips,
+        format: wNumb({
+          decimals: question.decimals
+        }),
         pips: {
           mode: question.pipsMode || "positions",
           values: question.pipsValues.map(function (pVal) {
@@ -103,13 +106,20 @@ function init(Survey) {
           format: {
             to: function (pVal) {
               var pipText = pVal;
+              const origPVal = pVal;
               question.pipsText.map(function (el) {
                 if (el.text !== undefined && pVal === el.value) {
                   pipText = el.text;
                 }
               });
+              if(pipText == origPVal){
+                return Number(origPVal).toFixed(question.decimals);
+              }
               return pipText;
             },
+            from: function (value) {
+              return Number(value).toFixed(question.decimals);
+            }
           },
         },
         range: {
